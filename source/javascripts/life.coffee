@@ -55,7 +55,6 @@ class GameOfLife
 		@numberOfColumns = cols
 
 	handleClick: (e) ->
-		console.log e
 		column = Math.floor(e.offsetX / @cellSize)
 		row = Math.floor(e.offsetY / @cellSize)
 		@currentCellGeneration[row][column].count = @fadeSteps
@@ -218,9 +217,12 @@ $ ->
 	$(life.canvas).mousedown (e) ->
 		mouseDown = true
 		life.handleClick(e)
+		$(life.canvas).addClass("mouseDown")
 	$(life.canvas).mouseup (e) ->
 		mouseDown = false
+		$(life.canvas).removeClass("mouseDown")
 	$(life.canvas).mousemove (e) ->
 		if mouseDown
 			life.handleClick(e)
-
+	life.canvas.onselectstart = ->
+		false

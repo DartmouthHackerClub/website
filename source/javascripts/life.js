@@ -78,7 +78,6 @@
 
     GameOfLife.prototype.handleClick = function(e) {
       var column, row;
-      console.log(e);
       column = Math.floor(e.offsetX / this.cellSize);
       row = Math.floor(e.offsetY / this.cellSize);
       return this.currentCellGeneration[row][column].count = this.fadeSteps;
@@ -295,16 +294,21 @@
     mouseDown = false;
     $(life.canvas).mousedown(function(e) {
       mouseDown = true;
-      return life.handleClick(e);
+      life.handleClick(e);
+      return $(life.canvas).addClass("mouseDown");
     });
     $(life.canvas).mouseup(function(e) {
-      return mouseDown = false;
+      mouseDown = false;
+      return $(life.canvas).removeClass("mouseDown");
     });
-    return $(life.canvas).mousemove(function(e) {
+    $(life.canvas).mousemove(function(e) {
       if (mouseDown) {
         return life.handleClick(e);
       }
     });
+    return life.canvas.onselectstart = function() {
+      return false;
+    };
   });
 
 }).call(this);
