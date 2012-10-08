@@ -1,2 +1,57 @@
 // This File is imported last, and will override other styles in the cascade
 // Add styles here to make changes without digging in too much
+
+#life {
+	position: absolute;
+	top: 0;
+	left: 0;
+	z-index: -10;
+}
+
+h1, h2, h3, h4, h5, h6 {
+	font-family: 'Orbitron', sans-serif;
+}
+
+h1#maintitle {
+	font-size: 8em;
+	color: #0F0;
+	text-shadow: 0px 2px 2px #0c0;
+	text-align: right;
+}
+
+#hero {
+	padding: 0;
+	margin: 0;
+}
+
+#hero-inner {
+	margin-top: 190px;
+}
+
+.content {
+	background-color: white;
+}
+
+.navbar, .navbar-search .search-query {
+	font-family: 'Orbitron', sans-serif;
+}
+
+.navbar .brand {
+	padding-top: 12px;
+}
+
+.navbar .nav > li > a {
+	padding-top: 11px;
+}
+
+article {
+	border-radius: 0 !important;
+	margin: 0;
+}
+
+@media (max-width: 767px) { 
+	h1#maintitle {
+		font-size: 5em;
+		text-align: center;
+	}
+}

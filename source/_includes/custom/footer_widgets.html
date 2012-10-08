@@ -1,35 +1,28 @@
 <div class="row">
-	<div class="span3">
+	<div class="span4">
 		<h2>recent posts</h2>
-		<ul class="recent_posts">
-			{% for post in site.posts limit: site.recent_posts %}
-			<li>
-			<a href="{{ root_url }}{{ post.url }}">{{ post.title }}</a>
-			</li>
-			{% endfor %}
-		</ul>
+		{% for post in site.posts limit: site.recent_posts %}
+		<h4><a href="{{ root_url }}{{ post.url }}">{{ post.title }}</a></h4>
+		{% endfor %}
 	</div>
-	<div class="span6">
+	<div class="span4">
 		<h2>github</h2>
 		<div id="github"></div>
 		<script type="text/javascript">
 			$(function() {
 					$.getJSON('https://api.github.com/users/dartmouthhackerclub/repos?sort=updated&callback=?', function(data) {
 						$(data.data).slice(0, 4).each(function(i, repo) {
-							console.log(repo);
-							$("#github").append("<dt><a href='" + repo.html_url + "'>" + repo.name + "</a></dt>");
-							$("#github").append("<dd>" + repo.description + "</dd>");
+							$("#github").append("<h4><a href='" + repo.html_url + "'>" + repo.name + "</a> <small>" + repo.description + "</small></h4>");
 							});
 						});
 					});
 		</script>
 	</div>
-	<div class="span3">
+	<div class="span4">
 		<h2>current captains</h2>
-		<ul class="unstyled">
-			<li>Marco Peraza '14</li>
-			<li>Zach Denton '15</li>
-			<li>Galen Pospisil '13</li>
-		</ul>
+		<h4>Marco Peraza '14</h4>
+		<h4>Zach Denton '15</h4>
+		<h4>Galen Pospisil '13</h4>
+		<h4>Adam Harris '12</h4>
 	</div>
 </div>
