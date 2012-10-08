@@ -55,9 +55,14 @@ class GameOfLife
 		@numberOfColumns = cols
 
 	handleClick: (e) ->
-		column = Math.floor(e.offsetX / @cellSize)
-		row = Math.floor(e.offsetY / @cellSize)
+		coords = @getCoords e
+		column = Math.floor(coords.x / @cellSize)
+		row = Math.floor(coords.y / @cellSize)
 		@currentCellGeneration[row][column].count = @fadeSteps
+
+	handleTouch: (e) ->
+		for touch in e.touches
+			@handleClick touch
 
 	createDrawingContext: ->
 		@drawingContext = @canvas.getContext '2d'
@@ -208,6 +213,17 @@ class GameOfLife
 
 		numberOfAliveNeighbors
 
+	getCoords: (e) ->
+		if (e.offsetX)
+			x: e.offsetX
+			y: e.offsetY
+		else if (e.layerX)
+			x: e.layerX
+			y: e.layerY
+		else
+			x: e.pageX - @canvas.offsetLeft
+			y: e.pageY - @canvas.offsetTop
+
 $ ->
 	life = new GameOfLife()
 	$(window).resize (e) ->
@@ -224,5 +240,9 @@ $ ->
 	$(life.canvas).mousemove (e) ->
 		if mouseDown
 			life.handleClick(e)
+	life.canvas.ontouchmove = (e) ->
+		life.handleTouch e
+	life.canvas.ontouchstart = (e) ->
+		life.handleTouch e
 	life.canvas.onselectstart = ->
 		false

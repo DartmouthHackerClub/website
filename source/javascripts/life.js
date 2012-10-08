@@ -77,10 +77,22 @@
     };
 
     GameOfLife.prototype.handleClick = function(e) {
-      var column, row;
-      column = Math.floor(e.offsetX / this.cellSize);
-      row = Math.floor(e.offsetY / this.cellSize);
+      var column, coords, row;
+      coords = this.getCoords(e);
+      column = Math.floor(coords.x / this.cellSize);
+      row = Math.floor(coords.y / this.cellSize);
       return this.currentCellGeneration[row][column].count = this.fadeSteps;
+    };
+
+    GameOfLife.prototype.handleTouch = function(e) {
+      var touch, _i, _len, _ref, _results;
+      _ref = e.touches;
+      _results = [];
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        touch = _ref[_i];
+        _results.push(this.handleClick(touch));
+      }
+      return _results;
     };
 
     GameOfLife.prototype.createDrawingContext = function() {
@@ -281,6 +293,25 @@
       return numberOfAliveNeighbors;
     };
 
+    GameOfLife.prototype.getCoords = function(e) {
+      if (e.offsetX) {
+        return {
+          x: e.offsetX,
+          y: e.offsetY
+        };
+      } else if (e.layerX) {
+        return {
+          x: e.layerX,
+          y: e.layerY
+        };
+      } else {
+        return {
+          x: e.pageX - this.canvas.offsetLeft,
+          y: e.pageY - this.canvas.offsetTop
+        };
+      }
+    };
+
     return GameOfLife;
 
   })();
@@ -306,6 +337,12 @@
         return life.handleClick(e);
       }
     });
+    life.canvas.ontouchmove = function(e) {
+      return life.handleTouch(e);
+    };
+    life.canvas.ontouchstart = function(e) {
+      return life.handleTouch(e);
+    };
     return life.canvas.onselectstart = function() {
       return false;
     };
