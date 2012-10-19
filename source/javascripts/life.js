@@ -7,7 +7,7 @@
 
     GameOfLife.prototype.currentCellGeneration = null;
 
-    GameOfLife.prototype.changeList = [];
+    GameOfLife.prototype.changeList = {};
 
     GameOfLife.prototype.cellSize = 20;
 
@@ -32,6 +32,7 @@
       this.createDrawingContext();
       this.seed();
       this.buildGliderGun();
+      this.redrawGrid();
       this.tick();
     }
 
@@ -111,7 +112,7 @@
           for (column = _j = 0, _ref1 = this.numberOfColumns; 0 <= _ref1 ? _j < _ref1 : _j > _ref1; column = 0 <= _ref1 ? ++_j : --_j) {
             seedCell = this.createSeedCell(row, column);
             this.currentCellGeneration[row][column] = seedCell;
-            _results1.push(this.changeList.push(seedCell));
+            _results1.push(this.changeList[[row, column]] = 1);
           }
           return _results1;
         }).call(this));
@@ -137,8 +138,8 @@
         this.cellSize = Math.floor($("#hero").width() / 15);
         this.resizeCanvas();
       }
-      xcenter = Math.floor((this.numberOfColumns - 13) / 4);
-      ycenter = Math.floor((this.numberOfRows - 37) / 4);
+      xcenter = Math.round((this.numberOfColumns - 13) / 4);
+      ycenter = Math.round((this.numberOfRows - 37) / 4);
       this.currentCellGeneration[ycenter][xcenter + 2].count = this.fadeSteps;
       this.currentCellGeneration[ycenter][xcenter + 3].count = this.fadeSteps;
       this.currentCellGeneration[ycenter + 1][xcenter + 2].count = this.fadeSteps;
@@ -193,13 +194,20 @@
     };
 
     GameOfLife.prototype.drawGrid = function() {
-      var cell, _i, _len, _ref;
-      _ref = this.changeList;
-      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        cell = _ref[_i];
-        this.drawCell(cell);
+      var column, coords, row;
+      for (coords in this.changeList) {
+        coords = coords.split(',');
+        row = coords[0];
+        column = coords[1];
+        if (row < 0 || row >= this.numberOfRows) {
+          continue;
+        }
+        if (column < 0 || column >= this.numberOfColumns) {
+          continue;
+        }
+        this.drawCell(this.currentCellGeneration[row][column]);
       }
-      return this.changeList = [];
+      return this.changeList = {};
     };
 
     GameOfLife.prototype.redrawGrid = function() {
@@ -249,7 +257,7 @@
           evolvedCell = this.evolveCell(currentCell);
           newCellGeneration[row][column] = evolvedCell;
           if (currentCell.count !== evolvedCell.count) {
-            this.changeList.push(evolvedCell);
+            this.changeList[[row, column]] = 1;
           }
         }
       }
@@ -273,14 +281,24 @@
     };
 
     GameOfLife.prototype.countAliveNeighbors = function(cell) {
-      var column, currentCell, lowerColumnBound, lowerRowBound, numberOfAliveNeighbors, row, upperColumnBound, upperRowBound, _i, _j;
-      lowerRowBound = Math.max(cell.row - 1, 0);
-      upperRowBound = Math.min(cell.row + 1, this.numberOfRows - 1);
-      lowerColumnBound = Math.max(cell.column - 1, 0);
-      upperColumnBound = Math.min(cell.column + 1, this.numberOfColumns - 1);
+      var column, currentCell, dcolumn, drow, numberOfAliveNeighbors, row, _i, _j;
       numberOfAliveNeighbors = 0;
-      for (row = _i = lowerRowBound; lowerRowBound <= upperRowBound ? _i <= upperRowBound : _i >= upperRowBound; row = lowerRowBound <= upperRowBound ? ++_i : --_i) {
-        for (column = _j = lowerColumnBound; lowerColumnBound <= upperColumnBound ? _j <= upperColumnBound : _j >= upperColumnBound; column = lowerColumnBound <= upperColumnBound ? ++_j : --_j) {
+      for (drow = _i = -1; _i <= 1; drow = ++_i) {
+        for (dcolumn = _j = -1; _j <= 1; dcolumn = ++_j) {
+          row = cell.row + drow;
+          column = cell.column + dcolumn;
+          if (row < 0) {
+            row += this.numberOfRows;
+          }
+          if (row >= this.numberOfRows) {
+            row -= this.numberOfRows;
+          }
+          if (column < 0) {
+            column += this.numberOfColumns;
+          }
+          if (column >= this.numberOfColumns) {
+            column -= this.numberOfColumns;
+          }
           if (row === cell.row && column === cell.column) {
             continue;
           }
@@ -294,22 +312,10 @@
     };
 
     GameOfLife.prototype.getCoords = function(e) {
-      if (e.offsetX) {
-        return {
-          x: e.offsetX,
-          y: e.offsetY
-        };
-      } else if (e.layerX) {
-        return {
-          x: e.layerX,
-          y: e.layerY
-        };
-      } else {
-        return {
-          x: e.pageX - this.canvas.offsetLeft,
-          y: e.pageY - this.canvas.offsetTop
-        };
-      }
+      return {
+        x: e.pageX,
+        y: e.pageY - $(window).scrollTop()
+      };
     };
 
     return GameOfLife;
@@ -317,33 +323,34 @@
   })();
 
   $(function() {
-    var life, mouseDown;
+    var hero, life, mouseDown;
     life = new GameOfLife();
     $(window).resize(function(e) {
       return life.resizeCanvas();
     });
     mouseDown = false;
-    $(life.canvas).mousedown(function(e) {
+    hero = $('#hero');
+    hero.mousedown(function(e) {
       mouseDown = true;
       life.handleClick(e);
-      return $(life.canvas).addClass("mouseDown");
+      return hero.addClass("mouseDown");
     });
-    $(life.canvas).mouseup(function(e) {
+    hero.mouseup(function(e) {
       mouseDown = false;
-      return $(life.canvas).removeClass("mouseDown");
+      return hero.removeClass("mouseDown");
     });
-    $(life.canvas).mousemove(function(e) {
+    hero.mousemove(function(e) {
       if (mouseDown) {
         return life.handleClick(e);
       }
     });
-    life.canvas.ontouchmove = function(e) {
+    hero.ontouchmove = function(e) {
       return life.handleTouch(e);
     };
-    life.canvas.ontouchstart = function(e) {
+    hero.ontouchstart = function(e) {
       return life.handleTouch(e);
     };
-    return life.canvas.onselectstart = function() {
+    return hero.onselectstart = function() {
       return false;
     };
   });
