@@ -1,5 +1,5 @@
 ---
-layout: default
+layout: post
 ---
 
 For a while now, one of our biggest problems has been deployment. Well, that's no longer a problem.
