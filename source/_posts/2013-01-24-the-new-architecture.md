@@ -4,6 +4,8 @@ layout: default
 
 For a while now, one of our biggest problems has been deployment. Well, that's no longer a problem.
 
+<!-- more -->
+
 ## Continuous Deployment
 
 Most people don't want to worry about the technical details of getting their code to run in a production environment -- they just want to write the code and be done with it. Our [new continous integration server](http://ci.hackdartmouth.org/) handles these technical details for us, leaving us to focus on the jobs that still demand human mental faculties.
